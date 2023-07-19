@@ -143,6 +143,7 @@ public class slotsClass {
                     validBet = true;
                 }
             } else {
+                System.out.println("Please enter a valid numeric input in increments of 25 cents.");
                 kb.nextLine();
             }
         }
@@ -214,14 +215,15 @@ public class slotsClass {
                 }
                 pot += winnings;
                 System.out.println("Your winnings from this turn are: " + formatCurrency(winnings));
-                System.out.println("Would you like to play again? Yes/No(Or hit enter to skip this prompt) \n Pot: "
-                        + formatCurrency(getPot()) + " Bet: "
-                        + formatCurrency(getBet()) + ".");
+                System.out.println(
+                        "Would you like to play again? Yes/No(Or hit enter to skip this prompt and automatically play) \n Pot: "
+                                + formatCurrency(getPot()) + " Bet: "
+                                + formatCurrency(getBet()) + ".");
                 String choice3Cont = kb.nextLine();
                 if (choice3Cont.equalsIgnoreCase("Yes") || choice3Cont.equalsIgnoreCase("")) {
                     continue;
-                } else {
-                    displayMenu();
+                } else if (choice3Cont.equalsIgnoreCase("No")) {
+                    break;
                 }
             }
         }
@@ -234,7 +236,14 @@ public class slotsClass {
      */
     public void cashOut() {
         if (pot == 0) {
-            System.out.println("You have nothing to cash out!");
+            System.out.println(
+                    "You have nothing to cash out! Are you sure you would like to leave? Yes/No (Or hit enter again to leave)");
+            String leave = kb.nextLine();
+            if (leave.equalsIgnoreCase("yes")) {
+                kb.next();
+            } else if (leave.equalsIgnoreCase("no")) {
+                startGame();
+            }
         } else {
             System.out.println("You cashed out " + formatCurrency(getPot()) + "! \n Congratulations!");
         }
