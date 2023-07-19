@@ -8,34 +8,40 @@
  */
 package edu.ilstu;
 
-import java.text.NumberFormat;
+import java.text.*;
 import java.util.*;
 
 public class slotsClass {
-    Scanner kb = new Scanner(System.in);
-    NumberFormat money;
+    private Scanner kb = new Scanner(System.in);
     private double pot;
     private double bet;
     private double add;
-    Random random = new Random();
+    private Random random = new Random();
     private char choice;
     private String menu;
 
+    // Constructor
     public slotsClass() {
         pot = 0.0;
         bet = 0.0;
-        money = NumberFormat.getCurrencyInstance(Locale.US);
-        money.setMinimumFractionDigits(0);
-        money.setMaximumFractionDigits(2);
     }
 
+    /**
+     * Displays the menu
+     * 
+     * @return menu to user
+     */
     public String displayMenu() {
-        menu = "\nMenu:                             Bet: " + money.format(getBet()) + " Pot: "
-                + money.format(getPot())
+        menu = "\nMenu:                             Bet: " + formatCurrency(getBet()) + " Pot: "
+                + formatCurrency(getPot())
                 + "\na. Add money to the pot \nb. Change bet\nc. Play\nd. Cash out\nPlease enter your choice (a through d): ";
         return menu;
     }
 
+    /**
+     * Starts the program, initially displaying menu
+     * 
+     */
     public void startGame() {
 
         do {
@@ -65,13 +71,22 @@ public class slotsClass {
         kb.close();
     }
 
+    /**
+     * Outputs current Pot value
+     * 
+     * @return pot value
+     */
     public double getPot() {
         return pot;
     }
 
+    /**
+     * Adds money to pot
+     * 
+     */
     public void addMoney() {
-        System.out
-                .println("Your current pot value is: " + money.format(getPot()) + "\nHow much would you like to add?");
+        System.out.println(
+                "Your current pot value is: " + formatCurrency(getPot()) + "\nHow much would you like to add?");
         boolean validAdd = false;
 
         while (!validAdd) {
@@ -90,16 +105,25 @@ public class slotsClass {
                 kb.nextLine();
             }
         }
-        System.out.println("Your new pot value is: " + money.format(getPot()));
+        System.out.println("Your new pot value is: " + formatCurrency(getPot()));
 
     }
 
+    /**
+     * Outputs current Bet value
+     * 
+     * @return bet value
+     */
     public double getBet() {
         return bet;
     }
 
+    /**
+     * Changes bet based on input
+     * 
+     */
     public void changeBet() {
-        System.out.println("Current Bet: " + money.format(getBet())
+        System.out.println("Current Bet: " + formatCurrency(getBet())
                 + "\nWhat would you like to set your bet to(Increments of 25 cents required): ");
         boolean validBet = false;
         while (!validBet) {
@@ -108,30 +132,46 @@ public class slotsClass {
 
                 if (suggBet < 0) {
                     System.out.println("I'm sorry, you cannot have a negative bet. ");
+                    kb.nextLine();
+                    break;
+                } else if (suggBet % .25 != 0) {
+                    System.out.println("Please enter a valid numeric input in increments of 25 cents.");
+                    kb.nextLine();
+
                 } else {
                     bet = suggBet;
                     validBet = true;
                 }
             } else {
-                System.out.println("Please enter a valid numeric input in increments of 25 cents.");
                 kb.nextLine();
             }
         }
     }
 
+    /**
+     * Runs the game itself
+     * 
+     */
     public void play() {
         while (choice == 'c') {
-            if (bet > pot) {
-                System.out.println("I'm sorry, you are betting (Bet: " + money.format(getBet())
-                        + ") more money than is in the pot. (Pot: " + money.format(getPot())
-                        + ") Please add more to the pot.");
+            if (pot < .25) {
+                System.out.println(
+                        "Your pot is lower than the minimum bet of 25 cents, please add more to the pot to continue.(Press enter to continue) ");
+                kb.nextLine();
+                break;
+            } else if (bet > pot) {
+                System.out.println("I'm sorry, you are betting (Bet: " + formatCurrency(getBet())
+                        + ") more money than is in the pot. (Pot: " + formatCurrency(getPot())
+                        + ") Please add more to the pot or lower your bet.(Press enter to continue.)");
+                kb.nextLine();
+                break;
             } else {
                 pot -= bet;
                 String[] rollOutcomes = { "Cherries", "Oranges", "Plums", "Bells", "Melons", "Bars" };
-                int[] rolls = new int[6];
+                int[] rolls = new int[5];
 
                 for (int i = 0; i < rolls.length; i++) {
-                    rolls[i] = random.nextInt(5);
+                    rolls[i] = random.nextInt(6);
                 }
 
                 for (int roll : rolls) {
@@ -173,10 +213,10 @@ public class slotsClass {
                         winnings = bet; // If machine breaks, user gets their bet back.
                 }
                 pot += winnings;
-                System.out.println("Your winnings from this turn are: " + money.format(winnings));
+                System.out.println("Your winnings from this turn are: " + formatCurrency(winnings));
                 System.out.println("Would you like to play again? Yes/No(Or hit enter to skip this prompt) \n Pot: "
-                        + money.format(getPot()) + " Bet: "
-                        + money.format(getBet()) + ".");
+                        + formatCurrency(getPot()) + " Bet: "
+                        + formatCurrency(getBet()) + ".");
                 String choice3Cont = kb.nextLine();
                 if (choice3Cont.equalsIgnoreCase("Yes") || choice3Cont.equalsIgnoreCase("")) {
                     continue;
@@ -188,12 +228,29 @@ public class slotsClass {
 
     }
 
+    /**
+     * Cashes out user with current pot value
+     * 
+     */
     public void cashOut() {
         if (pot == 0) {
             System.out.println("You have nothing to cash out!");
         } else {
-            System.out.println("You cashed out " + money.format(getPot()) + "! \n Congratulations!");
+            System.out.println("You cashed out " + formatCurrency(getPot()) + "! \n Congratulations!");
         }
+    }
 
+    /**
+     * Formats the currency with correct decimals
+     * 
+     * @param amount
+     * @return formatted currency
+     */
+    private String formatCurrency(double amount) {
+        if (amount == (int) amount) {
+            return NumberFormat.getCurrencyInstance(Locale.US).format(amount).replace(".00", "");
+        } else {
+            return NumberFormat.getCurrencyInstance(Locale.US).format(amount);
+        }
     }
 }
